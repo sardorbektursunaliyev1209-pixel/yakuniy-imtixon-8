@@ -25,6 +25,7 @@ const Register = () => {
   } = form;
 
   const onSubmit = (data: RegisterForm) => {
+    console.log("SUBMIT:", data);
     delete data.confirmPassword;
     delete data.terms;
     mutateAsync(data);
@@ -36,7 +37,7 @@ const Register = () => {
       setItem(token);
       toast.success("Ro'yxatdan o'tish yakunlandi");
       setTimeout(() => {
-        window.location.replace("/");
+        window.location.replace("/dashboard");
       }, 2000);
     }
   }, [isSuccess]);

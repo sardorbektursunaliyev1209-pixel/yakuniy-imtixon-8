@@ -1,8 +1,12 @@
 import { Icon } from "../ui/Icon";
 import SectionHeading from "../ui/SectionHeading";
-import { testimonials } from "../../data/home.data";
+import { useTestimonials } from "../../hooks/api/useTestimonials";
 
 const Testimonials = () => {
+  const { data: testimonials = [], isLoading } = useTestimonials();
+
+  if (isLoading) return null;
+
   return (
     <section className="bg-gray-50/70 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -13,9 +17,9 @@ const Testimonials = () => {
         />
 
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
-          {testimonials.map((item) => (
+          {testimonials.map((item: any) => (
             <figure
-              key={item.name}
+              key={item.id ?? item.name}
               className="flex flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
             >
               <span className="text-4xl leading-none text-blue-200">"</span>
@@ -25,17 +29,19 @@ const Testimonials = () => {
                 ))}
               </div>
               <blockquote className="mt-4 flex-1 text-sm italic leading-relaxed text-gray-600">
-                {item.text}
+                {item.text ?? item.comment ?? item.content}
               </blockquote>
               <figcaption className="mt-6 flex items-center gap-x-3 border-t border-gray-100 pt-4">
                 <img
-                  src={item.photo}
+                  src={item.photo ?? item.avatar ?? item.image ?? ""}
                   alt={item.name}
                   className="h-10 w-10 rounded-full object-cover"
                 />
                 <div>
                   <p className="text-sm font-semibold">{item.name}</p>
-                  <p className="text-xs text-gray-500">{item.role}</p>
+                  <p className="text-xs text-gray-500">
+                    {item.role ?? item.position}
+                  </p>
                 </div>
               </figcaption>
             </figure>

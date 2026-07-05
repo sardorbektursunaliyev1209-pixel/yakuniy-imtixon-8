@@ -8,6 +8,8 @@ import Blog from "../pages/Blog";
 import Courses from "../pages/Courses";
 import Faq from "../pages/Faq";
 import Pricing from "../pages/Pricing";
+import Dashboard from "../pages/dashboard";
+import ProtectedRoute from "../components/ui/ProtectedRoute";
 
 const routes = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -19,6 +21,14 @@ const routes = createBrowserRouter([
   { path: "/courses", element: <Courses /> },
   { path: "/faq", element: <Faq /> },
   { path: "/Narxlar", element: <Pricing /> },
+  {
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
+  },
 ]);
 
 export default routes;

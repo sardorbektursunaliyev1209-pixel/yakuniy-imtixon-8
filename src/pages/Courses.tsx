@@ -5,7 +5,7 @@ import CourseCard from "../components/courses/CourseCard";
 import CoursesFilters from "../components/courses/CoursesFilters";
 import CoursesToolbar from "../components/courses/CoursesToolbar";
 import CoursesPagination from "../components/courses/CoursesPagination";
-import { courses } from "../data/courses";
+import { useCourses } from "../hooks/api/useCourses";
 import type { CourseFilters } from "../types/course.type";
 import Header from "../components/home/Header";
 import Footer from "../components/home/Footer";
@@ -28,6 +28,16 @@ const Courses = () => {
     useState<CourseFilters>(defaultFilters);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const { data: coursesData, isLoading } = useCourses({
+    search: appliedFilters.search || undefined,
+    page: currentPage,
+    limit: PAGE_SIZE,
+  });
+
+  const courses = Array.isArray(coursesData)
+    ? coursesData
+    : (coursesData?.items ?? []);
+
   const filteredCourses = useMemo(() => {
     let result = [...courses];
 
@@ -36,19 +46,15 @@ const Courses = () => {
         appliedFilters.categories.includes(c.category),
       );
     }
-
     if (appliedFilters.level !== "Barchasi") {
       result = result.filter((c) => c.level === appliedFilters.level);
     }
-
     if (appliedFilters.minPrice !== null) {
       result = result.filter((c) => c.price >= appliedFilters.minPrice!);
     }
-
     if (appliedFilters.maxPrice !== null) {
       result = result.filter((c) => c.price <= appliedFilters.maxPrice!);
     }
-
     if (appliedFilters.durations.length > 0) {
       result = result.filter((c) =>
         appliedFilters.durations.some((d) => {
@@ -59,7 +65,6 @@ const Courses = () => {
         }),
       );
     }
-
     if (appliedFilters.search.trim()) {
       const q = appliedFilters.search.trim().toLowerCase();
       result = result.filter(
@@ -68,7 +73,6 @@ const Courses = () => {
           c.category.toLowerCase().includes(q),
       );
     }
-
     switch (appliedFilters.sort) {
       case "Arzon narx":
         result.sort((a, b) => a.price - b.price);
@@ -82,9 +86,8 @@ const Courses = () => {
       default:
         result.sort((a, b) => b.rating - a.rating);
     }
-
     return result;
-  }, [appliedFilters]);
+  }, [courses, appliedFilters]);
 
   const totalPages = Math.max(1, Math.ceil(filteredCourses.length / PAGE_SIZE));
   const paginatedCourses = filteredCourses.slice(
@@ -116,9 +119,17 @@ const Courses = () => {
     setAppliedFilters(next);
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500 text-lg">Yuklanmoqda...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
-      <Header />;
+      <Header />
       <section className="bg-gradient-to-b from-blue-50 to-white px-6 py-14 text-center">
         <div className="flex items-center justify-center gap-x-1.5 text-sm text-slate-500">
           <Link to="/" className="hover:text-slate-700">
@@ -127,7 +138,6 @@ const Courses = () => {
           <ChevronRight className="h-3.5 w-3.5" />
           <span className="font-medium text-slate-800">Kurslar</span>
         </div>
-
         <h1 className="mt-4 text-4xl font-bold text-slate-900 sm:text-5xl">
           Barcha kurslarimiz
         </h1>
@@ -136,7 +146,7 @@ const Courses = () => {
           barchasi video darslar. Boshlovchidan tortib mutaxassis darajasigacha.
         </p>
       </section>
-      {/* Content */}
+
       <section className="mx-auto max-w-7xl px-6 py-10">
         <CoursesToolbar
           search={filters.search}
@@ -171,7 +181,6 @@ const Courses = () => {
                 </p>
               </div>
             )}
-
             {filteredCourses.length > 0 && (
               <CoursesPagination
                 currentPage={currentPage}
